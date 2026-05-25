@@ -149,3 +149,79 @@ export const SearchNotionResponseItem = zod.object({
 export const SearchNotionResponse = zod.array(SearchNotionResponseItem)
 
 
+/**
+ * Returns all published Notion pages
+ * @summary List published pages
+ */
+export const ListPublishedPagesResponseItem = zod.object({
+  "notionPageId": zod.string(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "notionUrl": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "isPublished": zod.boolean(),
+  "publishedAt": zod.string().optional(),
+  "updatedAt": zod.string().optional()
+})
+export const ListPublishedPagesResponse = zod.array(ListPublishedPagesResponseItem)
+
+
+/**
+ * Marks a Notion page as published on the content hub
+ * @summary Publish a page
+ */
+export const PublishPageBody = zod.object({
+  "notionPageId": zod.string(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "notionUrl": zod.string().optional(),
+  "description": zod.string().optional()
+})
+
+
+/**
+ * Returns a published page with its Notion content
+ * @summary Get published page by slug
+ */
+export const GetPublishedPageParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetPublishedPageResponse = zod.object({
+  "notionPageId": zod.string(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "notionUrl": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "isPublished": zod.boolean().optional(),
+  "publishedAt": zod.string().optional(),
+  "content": zod.array(zod.object({
+  "type": zod.string().optional(),
+  "text": zod.string().nullish(),
+  "children": zod.array(zod.object({
+
+}).passthrough()).optional()
+}))
+})
+
+
+/**
+ * Removes a page from the public content hub
+ * @summary Unpublish a page
+ */
+export const UnpublishPageParams = zod.object({
+  "notionPageId": zod.coerce.string()
+})
+
+export const UnpublishPageResponse = zod.object({
+  "notionPageId": zod.string(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "notionUrl": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "isPublished": zod.boolean(),
+  "publishedAt": zod.string().optional(),
+  "updatedAt": zod.string().optional()
+})
+
+

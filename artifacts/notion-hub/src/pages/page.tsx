@@ -1,13 +1,45 @@
-import { useGetPage, getGetPageQueryKey } from "@workspace/api-client-react";
+import { useGetPage, getGetPageQueryKey, usePublishPage, useUnpublishPage, useListPublishedPages } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
-import { Loader2, ArrowLeft, Calendar } from "lucide-react";
+import { Loader2, ArrowLeft, Calendar, Globe, EyeOff } from "lucide-react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+
+function slugify(title: string): string {
+  return title.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .substring(0, 60);
+}
 
 export default function PageDetail() {
   const { id } = useParams<{ id: string }>();
-  
+  const queryClient = useQueryClient();
+  const [slugInput, setSlugInput] = useState("");
+
   const { data: page, isLoading } = useGetPage(id!, {
     query: { enabled: !!id, queryKey: getGetPageQueryKey(id!) }
+  });
+
+  const { data: publishedPages } = useListPublishedPages();
+  const isPublished = publishedPages?.some((p: any) => p.notionPageId === id && p.isPublished);
+  const publishedPage = publishedPages?.find((p: any) => p.notionPageId === id);
+
+  const publishMutation = usePublishPage({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["listPublishedPages"] });
+      }
+    }
+  });
+
+  const unpublishMutation = useUnpublishPage({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["listPublishedPages"] });
+      }
+    }
   });
 
   if (isLoading) {
@@ -76,6 +108,62 @@ export default function PageDetail() {
               </span>
             )}
           </div>
+        </div>
+
+        {/* Publish controls */}
+        <div className="flex items-center gap-3 pt-2">
+          {isPublished ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-green-600 border-green-200 hover:bg-green-50"
+                asChild
+              >
+                <Link href={`/content/${publishedPage?.slug}`}>
+                  <Globe className="w-4 h-4 mr-1.5" />
+                  Public page
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => unpublishMutation.mutate({ notionPageId: id! })}
+                disabled={unpublishMutation.isPending}
+              >
+                <EyeOff className="w-4 h-4 mr-1.5" />
+                {unpublishMutation.isPending ? "Unpublishing..." : "Unpublish"}
+              </Button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="custom-url-slug"
+                value={slugInput}
+                onChange={(e) => setSlugInput(e.target.value)}
+                className="h-8 px-3 text-sm border rounded-md bg-background w-48"
+              />
+              <Button
+                size="sm"
+                onClick={() => {
+                  const slug = slugInput.trim() || slugify(page.title || "untitled");
+                  publishMutation.mutate({
+                    data: {
+                      notionPageId: id!,
+                      title: page.title || "Untitled",
+                      slug,
+                      notionUrl: page.url || "",
+                    }
+                  });
+                }}
+                disabled={publishMutation.isPending}
+              >
+                <Globe className="w-4 h-4 mr-1.5" />
+                {publishMutation.isPending ? "Publishing..." : "Publish to Content Hub"}
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 

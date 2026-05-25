@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Database, Search } from "lucide-react";
+import { LayoutDashboard, Database, Search, Globe } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +42,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       <Link href="/search">
                         <Search className="w-4 h-4 mr-2" />
                         <span>Search</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.startsWith("/content-hub")}>
+                      <Link href="/content-hub">
+                        <Globe className="w-4 h-4 mr-2" />
+                        <span>Content Hub</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

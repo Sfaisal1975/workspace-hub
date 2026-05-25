@@ -159,6 +159,77 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchResult"
+  /published:
+    get:
+      operationId: listPublishedPages
+      tags: [published]
+      summary: List published pages
+      description: Returns all published Notion pages
+      responses:
+        "200":
+          description: List of published pages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublishedPage"
+    post:
+      operationId: publishPage
+      tags: [published]
+      summary: Publish a page
+      description: Marks a Notion page as published on the content hub
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PagePublishInput"
+      responses:
+        "201":
+          description: Published page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedPage"
+  /published/{slug}:
+    get:
+      operationId: getPublishedPage
+      tags: [published]
+      summary: Get published page by slug
+      description: Returns a published page with its Notion content
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Published page with content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedPageDetail"
+  /published/{notionPageId}/unpublish:
+    post:
+      operationId: unpublishPage
+      tags: [published]
+      summary: Unpublish a page
+      description: Removes a page from the public content hub
+      parameters:
+        - name: notionPageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Unpublished successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedPage"
 components:
   schemas:
     HealthStatus:
@@ -257,3 +328,68 @@ components:
           type: string
         createdAt:
           type: string
+    PublishedPage:
+      type: object
+      required: [notionPageId, title, slug, isPublished]
+      properties:
+        notionPageId:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        notionUrl:
+          type: string
+        description:
+          type: ["string", "null"]
+        isPublished:
+          type: boolean
+        publishedAt:
+          type: string
+        updatedAt:
+          type: string
+    PagePublishInput:
+      type: object
+      required: [notionPageId, title, slug]
+      properties:
+        notionPageId:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        notionUrl:
+          type: string
+        description:
+          type: string
+    PublishedPageDetail:
+      type: object
+      required: [notionPageId, title, slug, content]
+      properties:
+        notionPageId:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        notionUrl:
+          type: string
+        description:
+          type: ["string", "null"]
+        isPublished:
+          type: boolean
+        publishedAt:
+          type: string
+        content:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              text:
+                type: ["string", "null"]
+              children:
+                type: array
+                items:
+                  type: object

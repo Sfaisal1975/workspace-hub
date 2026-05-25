@@ -25,6 +25,9 @@ import type {
   NotionDatabase,
   NotionEntry,
   NotionPage,
+  PagePublishInput,
+  PublishedPage,
+  PublishedPageDetail,
   SearchNotionParams,
   SearchResult,
   WorkspaceOverview
@@ -667,4 +670,303 @@ export function useSearchNotion<TData = Awaited<ReturnType<typeof searchNotion>>
 
 
 
+
+export const getListPublishedPagesUrl = () => {
+
+
+
+
+  return `/api/published`
+}
+
+/**
+ * Returns all published Notion pages
+ * @summary List published pages
+ */
+export const listPublishedPages = async ( options?: RequestInit): Promise<PublishedPage[]> => {
+
+  return customFetch<PublishedPage[]>(getListPublishedPagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublishedPagesQueryKey = () => {
+    return [
+    `/api/published`
+    ] as const;
+    }
+
+
+export const getListPublishedPagesQueryOptions = <TData = Awaited<ReturnType<typeof listPublishedPages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublishedPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublishedPagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublishedPages>>> = ({ signal }) => listPublishedPages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublishedPages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublishedPagesQueryResult = NonNullable<Awaited<ReturnType<typeof listPublishedPages>>>
+export type ListPublishedPagesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List published pages
+ */
+
+export function useListPublishedPages<TData = Awaited<ReturnType<typeof listPublishedPages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublishedPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublishedPagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getPublishPageUrl = () => {
+
+
+
+
+  return `/api/published`
+}
+
+/**
+ * Marks a Notion page as published on the content hub
+ * @summary Publish a page
+ */
+export const publishPage = async (pagePublishInput: PagePublishInput, options?: RequestInit): Promise<PublishedPage> => {
+
+  return customFetch<PublishedPage>(getPublishPageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      pagePublishInput,)
+  }
+);}
+
+
+
+
+export const getPublishPageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishPage>>, TError,{data: BodyType<PagePublishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishPage>>, TError,{data: BodyType<PagePublishInput>}, TContext> => {
+
+const mutationKey = ['publishPage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishPage>>, {data: BodyType<PagePublishInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  publishPage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishPageMutationResult = NonNullable<Awaited<ReturnType<typeof publishPage>>>
+    export type PublishPageMutationBody = BodyType<PagePublishInput>
+    export type PublishPageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Publish a page
+ */
+export const usePublishPage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishPage>>, TError,{data: BodyType<PagePublishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof publishPage>>,
+        TError,
+        {data: BodyType<PagePublishInput>},
+        TContext
+      > => {
+      return useMutation(getPublishPageMutationOptions(options));
+    }
+
+export const getGetPublishedPageUrl = (slug: string,) => {
+
+
+
+
+  return `/api/published/${slug}`
+}
+
+/**
+ * Returns a published page with its Notion content
+ * @summary Get published page by slug
+ */
+export const getPublishedPage = async (slug: string, options?: RequestInit): Promise<PublishedPageDetail> => {
+
+  return customFetch<PublishedPageDetail>(getGetPublishedPageUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublishedPageQueryKey = (slug: string,) => {
+    return [
+    `/api/published/${slug}`
+    ] as const;
+    }
+
+
+export const getGetPublishedPageQueryOptions = <TData = Awaited<ReturnType<typeof getPublishedPage>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublishedPageQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublishedPage>>> = ({ signal }) => getPublishedPage(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublishedPage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublishedPageQueryResult = NonNullable<Awaited<ReturnType<typeof getPublishedPage>>>
+export type GetPublishedPageQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get published page by slug
+ */
+
+export function useGetPublishedPage<TData = Awaited<ReturnType<typeof getPublishedPage>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublishedPageQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUnpublishPageUrl = (notionPageId: string,) => {
+
+
+
+
+  return `/api/published/${notionPageId}/unpublish`
+}
+
+/**
+ * Removes a page from the public content hub
+ * @summary Unpublish a page
+ */
+export const unpublishPage = async (notionPageId: string, options?: RequestInit): Promise<PublishedPage> => {
+
+  return customFetch<PublishedPage>(getUnpublishPageUrl(notionPageId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getUnpublishPageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishPage>>, TError,{notionPageId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unpublishPage>>, TError,{notionPageId: string}, TContext> => {
+
+const mutationKey = ['unpublishPage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unpublishPage>>, {notionPageId: string}> = (props) => {
+          const {notionPageId} = props ?? {};
+
+          return  unpublishPage(notionPageId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnpublishPageMutationResult = NonNullable<Awaited<ReturnType<typeof unpublishPage>>>
+
+    export type UnpublishPageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Unpublish a page
+ */
+export const useUnpublishPage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishPage>>, TError,{notionPageId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof unpublishPage>>,
+        TError,
+        {notionPageId: string},
+        TContext
+      > => {
+      return useMutation(getUnpublishPageMutationOptions(options));
+    }
 

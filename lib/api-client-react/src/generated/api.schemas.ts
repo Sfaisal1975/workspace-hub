@@ -75,6 +75,47 @@ export interface NotionPage {
   content?: NotionPageContentItem[];
 }
 
+export interface PublishedPage {
+  notionPageId: string;
+  title: string;
+  slug: string;
+  notionUrl?: string;
+  /** @nullable */
+  description?: string | null;
+  isPublished: boolean;
+  publishedAt?: string;
+  updatedAt?: string;
+}
+
+export interface PagePublishInput {
+  notionPageId: string;
+  title: string;
+  slug: string;
+  notionUrl?: string;
+  description?: string;
+}
+
+export type PublishedPageDetailContentItemChildrenItem = { [key: string]: unknown };
+
+export type PublishedPageDetailContentItem = {
+  type?: string;
+  /** @nullable */
+  text?: string | null;
+  children?: PublishedPageDetailContentItemChildrenItem[];
+};
+
+export interface PublishedPageDetail {
+  notionPageId: string;
+  title: string;
+  slug: string;
+  notionUrl?: string;
+  /** @nullable */
+  description?: string | null;
+  isPublished?: boolean;
+  publishedAt?: string;
+  content: PublishedPageDetailContentItem[];
+}
+
 export type SearchNotionParams = {
 q: string;
 };

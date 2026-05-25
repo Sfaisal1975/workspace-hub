@@ -8,6 +8,8 @@ import Databases from "@/pages/databases";
 import SearchPage from "@/pages/search";
 import DatabaseDetail from "@/pages/database";
 import PageDetail from "@/pages/page";
+import ContentHub from "@/pages/content-hub";
+import PublicPage from "@/pages/public-page";
 import { AppLayout } from "@/components/layout";
 
 const queryClient = new QueryClient();
@@ -21,6 +23,8 @@ function Router() {
         <Route path="/databases/:id" component={DatabaseDetail} />
         <Route path="/pages/:id" component={PageDetail} />
         <Route path="/search" component={SearchPage} />
+        <Route path="/content-hub" component={ContentHub} />
+        <Route path="/content/:slug" component={PublicPage} />
         <Route component={NotFound} />
       </Switch>
     </AppLayout>
