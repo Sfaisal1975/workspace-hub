@@ -58,6 +58,7 @@ router.get("/mail/folders/:folderId/emails", async (req: Request, res: Response)
     .orderBy(emailsTable.sentAt);
   const list = rows.map((r) => ({
     ...r,
+    sentAt: r.sentAt instanceof Date ? r.sentAt.toISOString() : r.sentAt,
     sender: { name: r.senderName, email: r.senderEmail, avatarUrl: r.senderAvatarUrl },
     recipients: JSON.parse(r.recipientsJson) as { name: string; email: string }[],
   }));
@@ -78,6 +79,7 @@ router.get("/mail/emails/:id", async (req: Request, res: Response) => {
     .where(eq(emailAttachmentsTable.emailId, id));
   const detail = {
     ...email,
+    sentAt: email.sentAt instanceof Date ? email.sentAt.toISOString() : email.sentAt,
     sender: { name: email.senderName, email: email.senderEmail, avatarUrl: email.senderAvatarUrl },
     recipients: JSON.parse(email.recipientsJson) as { name: string; email: string }[],
     attachments,
@@ -105,6 +107,7 @@ router.patch("/mail/emails/:id", async (req: Request, res: Response) => {
     .returning();
   const result = {
     ...updated[0],
+    sentAt: updated[0].sentAt instanceof Date ? updated[0].sentAt.toISOString() : updated[0].sentAt,
     sender: { name: updated[0].senderName, email: updated[0].senderEmail, avatarUrl: updated[0].senderAvatarUrl },
     recipients: JSON.parse(updated[0].recipientsJson) as { name: string; email: string }[],
   };
@@ -127,6 +130,7 @@ router.post("/mail/emails/:id/move", async (req: Request, res: Response) => {
     .returning();
   const result = {
     ...updated[0],
+    sentAt: updated[0].sentAt instanceof Date ? updated[0].sentAt.toISOString() : updated[0].sentAt,
     sender: { name: updated[0].senderName, email: updated[0].senderEmail, avatarUrl: updated[0].senderAvatarUrl },
     recipients: JSON.parse(updated[0].recipientsJson) as { name: string; email: string }[],
   };
@@ -162,6 +166,7 @@ router.post("/mail/emails", async (req: Request, res: Response) => {
     .returning();
   const result = {
     ...inserted[0],
+    sentAt: inserted[0].sentAt instanceof Date ? inserted[0].sentAt.toISOString() : inserted[0].sentAt,
     sender: { name: inserted[0].senderName, email: inserted[0].senderEmail, avatarUrl: inserted[0].senderAvatarUrl },
     recipients: JSON.parse(inserted[0].recipientsJson) as { name: string; email: string }[],
   };
@@ -196,7 +201,12 @@ router.get("/mail/calendar/events", async (_req: Request, res: Response) => {
         .select()
         .from(calendarEventAttendeesTable)
         .where(eq(calendarEventAttendeesTable.eventId, ev.id));
-      return { ...ev, attendees };
+      return {
+        ...ev,
+        startAt: ev.startAt instanceof Date ? ev.startAt.toISOString() : ev.startAt,
+        endAt: ev.endAt instanceof Date ? ev.endAt.toISOString() : ev.endAt,
+        attendees,
+      };
     }),
   );
   res.json(ListCalendarEventsResponse.parse(events));
@@ -232,7 +242,12 @@ router.post("/mail/calendar/events", async (req: Request, res: Response) => {
     .from(calendarEventAttendeesTable)
     .where(eq(calendarEventAttendeesTable.eventId, id));
 
-  res.status(201).json({ ...event, attendees });
+  res.status(201).json({
+    ...event,
+    startAt: event.startAt instanceof Date ? event.startAt.toISOString() : event.startAt,
+    endAt: event.endAt instanceof Date ? event.endAt.toISOString() : event.endAt,
+    attendees,
+  });
 });
 
 export default router;

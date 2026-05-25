@@ -4,7 +4,10 @@ import {
   useListMailFolders, 
   useListFolderEmails, 
   useGetEmail,
-  useUpdateEmail
+  useUpdateEmail,
+  getListMailFoldersQueryKey,
+  getListFolderEmailsQueryKey,
+  getGetEmailQueryKey,
 } from "@workspace/api-client-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { 
@@ -52,7 +55,7 @@ export default function InboxPage() {
   const primaryAccount = accounts?.[0];
   
   const { data: folders, isLoading: foldersLoading } = useListMailFolders(primaryAccount?.id || "", {
-    query: { enabled: !!primaryAccount?.id }
+    query: { enabled: !!primaryAccount?.id, queryKey: getListMailFoldersQueryKey(primaryAccount?.id || "") }
   });
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
@@ -66,13 +69,13 @@ export default function InboxPage() {
   }, [folders, activeFolderId]);
 
   const { data: emails, isLoading: emailsLoading } = useListFolderEmails(activeFolderId || "", {
-    query: { enabled: !!activeFolderId }
+    query: { enabled: !!activeFolderId, queryKey: getListFolderEmailsQueryKey(activeFolderId || "") }
   });
 
   const [activeEmailId, setActiveEmailId] = useState<string | null>(null);
 
   const { data: activeEmail, isLoading: emailLoading } = useGetEmail(activeEmailId || "", {
-    query: { enabled: !!activeEmailId }
+    query: { enabled: !!activeEmailId, queryKey: getGetEmailQueryKey(activeEmailId || "") }
   });
 
   return (
