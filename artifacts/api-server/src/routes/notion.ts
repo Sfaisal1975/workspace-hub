@@ -153,7 +153,7 @@ router.get("/databases/:id", async (req, res) => {
     res.json({
       id: db.id,
       title: extractTitle(db),
-      url: db.url || "",
+      url: (db as any).url || "",
       createdAt: (db as any).created_time || "",
       properties: db.properties || {},
     });

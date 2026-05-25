@@ -2,27 +2,36 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+
 import NotFound from "@/pages/not-found";
+import Layout from "@/components/layout";
+import Inbox from "@/pages/inbox";
+import Compose from "@/pages/compose";
+import Calendar from "@/pages/calendar";
+import Contacts from "@/pages/contacts";
+import Settings from "@/pages/settings";
 
-const queryClient = new QueryClient();
-
-function Home() {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Replit Agent is building...</h1>
-        <p className="mt-2 text-sm text-gray-600">Your app will appear here once it's ready.</p>
-      </div>
-    </div>
-  );
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/" component={Inbox} />
+        <Route path="/compose" component={Compose} />
+        <Route path="/calendar" component={Calendar} />
+        <Route path="/contacts" component={Contacts} />
+        <Route path="/settings" component={Settings} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 
