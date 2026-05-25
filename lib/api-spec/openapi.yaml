@@ -12,6 +12,10 @@ tags:
     description: Health operations
   - name: notion
     description: Notion workspace operations
+  - name: published
+    description: Content hub operations
+  - name: mail
+    description: Mail app operations
 paths:
   /healthz:
     get:
@@ -230,6 +234,238 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PublishedPage"
+  /mail/accounts:
+    get:
+      operationId: listMailAccounts
+      tags: [mail]
+      summary: List email accounts
+      description: Returns all configured email accounts
+      responses:
+        "200":
+          description: List of email accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MailAccount"
+  /mail/accounts/{accountId}/folders:
+    get:
+      operationId: listMailFolders
+      tags: [mail]
+      summary: List folders for account
+      description: Returns folders (Inbox, Sent, Drafts, Trash) for an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of folders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MailFolder"
+  /mail/folders/{folderId}/emails:
+    get:
+      operationId: listFolderEmails
+      tags: [mail]
+      summary: List emails in folder
+      description: Returns emails in a specific folder
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of emails
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Email"
+  /mail/emails/{id}:
+    get:
+      operationId: getEmail
+      tags: [mail]
+      summary: Get email details
+      description: Returns full email with body and attachments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Email details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDetail"
+    patch:
+      operationId: updateEmail
+      tags: [mail]
+      summary: Update email
+      description: Mark read/unread, star/unstar, or move folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailUpdate"
+      responses:
+        "200":
+          description: Updated email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+  /mail/emails/{id}/move:
+    post:
+      operationId: moveEmail
+      tags: [mail]
+      summary: Move email to folder
+      description: Moves an email to a different folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailMoveInput"
+      responses:
+        "200":
+          description: Moved email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+  /mail/emails:
+    post:
+      operationId: sendEmail
+      tags: [mail]
+      summary: Send new email
+      description: Creates and sends a new email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailSendInput"
+      responses:
+        "201":
+          description: Sent email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+  /mail/contacts:
+    get:
+      operationId: listContacts
+      tags: [mail]
+      summary: List contacts
+      description: Returns all contacts
+      responses:
+        "200":
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contact"
+    post:
+      operationId: createContact
+      tags: [mail]
+      summary: Add contact
+      description: Creates a new contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Created contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+  /mail/contacts/{id}:
+    delete:
+      operationId: deleteContact
+      tags: [mail]
+      summary: Delete contact
+      description: Removes a contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /mail/calendar/events:
+    get:
+      operationId: listCalendarEvents
+      tags: [mail]
+      summary: List calendar events
+      description: Returns calendar events for the current week
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalendarEvent"
+    post:
+      operationId: createCalendarEvent
+      tags: [mail]
+      summary: Create event
+      description: Creates a new calendar event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalendarEventInput"
+      responses:
+        "201":
+          description: Created event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalendarEvent"
 components:
   schemas:
     HealthStatus:
@@ -393,3 +629,246 @@ components:
                 type: array
                 items:
                   type: object
+    MailAccount:
+      type: object
+      required: [id, name, email, provider]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        provider:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+    MailFolder:
+      type: object
+      required: [id, name, accountId, type]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        accountId:
+          type: string
+        type:
+          type: string
+          enum: [inbox, sent, drafts, trash, spam, archive]
+        unreadCount:
+          type: integer
+    Email:
+      type: object
+      required: [id, subject, sender, recipients, folderId, isRead, isStarred, sentAt]
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        sender:
+          type: object
+          required: [name, email]
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            avatarUrl:
+              type: ["string", "null"]
+        recipients:
+          type: array
+          items:
+            type: object
+            required: [name, email]
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+        folderId:
+          type: string
+        isRead:
+          type: boolean
+        isStarred:
+          type: boolean
+        sentAt:
+          type: string
+        preview:
+          type: string
+        hasAttachments:
+          type: boolean
+    EmailDetail:
+      type: object
+      required: [id, subject, sender, recipients, folderId, isRead, isStarred, sentAt, body]
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        sender:
+          type: object
+          required: [name, email]
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            avatarUrl:
+              type: ["string", "null"]
+        recipients:
+          type: array
+          items:
+            type: object
+            required: [name, email]
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+        folderId:
+          type: string
+        isRead:
+          type: boolean
+        isStarred:
+          type: boolean
+        sentAt:
+          type: string
+        body:
+          type: string
+        preview:
+          type: string
+        hasAttachments:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmailAttachment"
+    EmailAttachment:
+      type: object
+      required: [id, name, size, mimeType]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        size:
+          type: integer
+        mimeType:
+          type: string
+    EmailUpdate:
+      type: object
+      properties:
+        isRead:
+          type: boolean
+        isStarred:
+          type: boolean
+        folderId:
+          type: string
+    EmailMoveInput:
+      type: object
+      required: [folderId]
+      properties:
+        folderId:
+          type: string
+    EmailSendInput:
+      type: object
+      required: [subject, recipients, body]
+      properties:
+        subject:
+          type: string
+        recipients:
+          type: array
+          items:
+            type: string
+        body:
+          type: string
+        cc:
+          type: array
+          items:
+            type: string
+        bcc:
+          type: array
+          items:
+            type: string
+        accountId:
+          type: string
+    Contact:
+      type: object
+      required: [id, name, email]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        company:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+    ContactInput:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        company:
+          type: string
+        notes:
+          type: string
+    CalendarEvent:
+      type: object
+      required: [id, title, startAt, endAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        startAt:
+          type: string
+        endAt:
+          type: string
+        location:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        attendees:
+          type: array
+          items:
+            type: object
+            required: [email]
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+              status:
+                type: string
+                enum: [accepted, tentative, declined, pending]
+    CalendarEventInput:
+      type: object
+      required: [title, startAt, endAt]
+      properties:
+        title:
+          type: string
+        startAt:
+          type: string
+        endAt:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        attendees:
+          type: array
+          items:
+            type: string

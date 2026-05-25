@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/mail/"
+title = "Mail"
+version = "1.0.0"
+id = "artifacts/mail-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/mail/" ]
+localPort = 20475
+
+[services.development]
+run = "pnpm --filter @workspace/mail-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mail-app", "run", "build" ]
+publicDir = "artifacts/mail-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20475"
+BASE_PATH = "/mail/"

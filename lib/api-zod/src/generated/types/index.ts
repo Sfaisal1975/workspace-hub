@@ -6,9 +6,29 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './calendarEvent';
+export * from './calendarEventAttendeesItem';
+export * from './calendarEventAttendeesItemStatus';
+export * from './calendarEventInput';
+export * from './contact';
+export * from './contactInput';
+export * from './deleteContact200';
+export * from './email';
+export * from './emailAttachment';
+export * from './emailDetail';
+export * from './emailDetailRecipientsItem';
+export * from './emailDetailSender';
+export * from './emailMoveInput';
+export * from './emailRecipientsItem';
+export * from './emailSender';
+export * from './emailSendInput';
+export * from './emailUpdate';
 export * from './entryUpdate';
 export * from './entryUpdateProperties';
 export * from './healthStatus';
+export * from './mailAccount';
+export * from './mailFolder';
+export * from './mailFolderType';
 export * from './notionDatabase';
 export * from './notionDatabaseProperties';
 export * from './notionEntry';

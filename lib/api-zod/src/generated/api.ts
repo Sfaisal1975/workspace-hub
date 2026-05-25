@@ -225,3 +225,259 @@ export const UnpublishPageResponse = zod.object({
 })
 
 
+/**
+ * Returns all configured email accounts
+ * @summary List email accounts
+ */
+export const ListMailAccountsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "provider": zod.string(),
+  "avatarUrl": zod.string().nullish()
+})
+export const ListMailAccountsResponse = zod.array(ListMailAccountsResponseItem)
+
+
+/**
+ * Returns folders (Inbox, Sent, Drafts, Trash) for an account
+ * @summary List folders for account
+ */
+export const ListMailFoldersParams = zod.object({
+  "accountId": zod.coerce.string()
+})
+
+export const ListMailFoldersResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "accountId": zod.string(),
+  "type": zod.enum(['inbox', 'sent', 'drafts', 'trash', 'spam', 'archive']),
+  "unreadCount": zod.number().optional()
+})
+export const ListMailFoldersResponse = zod.array(ListMailFoldersResponseItem)
+
+
+/**
+ * Returns emails in a specific folder
+ * @summary List emails in folder
+ */
+export const ListFolderEmailsParams = zod.object({
+  "folderId": zod.coerce.string()
+})
+
+export const ListFolderEmailsResponseItem = zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "sender": zod.object({
+  "name": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullish()
+}),
+  "recipients": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string()
+})),
+  "folderId": zod.string(),
+  "isRead": zod.boolean(),
+  "isStarred": zod.boolean(),
+  "sentAt": zod.string(),
+  "preview": zod.string().optional(),
+  "hasAttachments": zod.boolean().optional()
+})
+export const ListFolderEmailsResponse = zod.array(ListFolderEmailsResponseItem)
+
+
+/**
+ * Returns full email with body and attachments
+ * @summary Get email details
+ */
+export const GetEmailParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetEmailResponse = zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "sender": zod.object({
+  "name": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullish()
+}),
+  "recipients": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string()
+})),
+  "folderId": zod.string(),
+  "isRead": zod.boolean(),
+  "isStarred": zod.boolean(),
+  "sentAt": zod.string(),
+  "body": zod.string(),
+  "preview": zod.string().optional(),
+  "hasAttachments": zod.boolean().optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "size": zod.number(),
+  "mimeType": zod.string()
+})).optional()
+})
+
+
+/**
+ * Mark read/unread, star/unstar, or move folder
+ * @summary Update email
+ */
+export const UpdateEmailParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const UpdateEmailBody = zod.object({
+  "isRead": zod.boolean().optional(),
+  "isStarred": zod.boolean().optional(),
+  "folderId": zod.string().optional()
+})
+
+export const UpdateEmailResponse = zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "sender": zod.object({
+  "name": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullish()
+}),
+  "recipients": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string()
+})),
+  "folderId": zod.string(),
+  "isRead": zod.boolean(),
+  "isStarred": zod.boolean(),
+  "sentAt": zod.string(),
+  "preview": zod.string().optional(),
+  "hasAttachments": zod.boolean().optional()
+})
+
+
+/**
+ * Moves an email to a different folder
+ * @summary Move email to folder
+ */
+export const MoveEmailParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const MoveEmailBody = zod.object({
+  "folderId": zod.string()
+})
+
+export const MoveEmailResponse = zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "sender": zod.object({
+  "name": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullish()
+}),
+  "recipients": zod.array(zod.object({
+  "name": zod.string(),
+  "email": zod.string()
+})),
+  "folderId": zod.string(),
+  "isRead": zod.boolean(),
+  "isStarred": zod.boolean(),
+  "sentAt": zod.string(),
+  "preview": zod.string().optional(),
+  "hasAttachments": zod.boolean().optional()
+})
+
+
+/**
+ * Creates and sends a new email
+ * @summary Send new email
+ */
+export const SendEmailBody = zod.object({
+  "subject": zod.string(),
+  "recipients": zod.array(zod.string()),
+  "body": zod.string(),
+  "cc": zod.array(zod.string()).optional(),
+  "bcc": zod.array(zod.string()).optional(),
+  "accountId": zod.string().optional()
+})
+
+
+/**
+ * Returns all contacts
+ * @summary List contacts
+ */
+export const ListContactsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+export const ListContactsResponse = zod.array(ListContactsResponseItem)
+
+
+/**
+ * Creates a new contact
+ * @summary Add contact
+ */
+export const CreateContactBody = zod.object({
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().optional(),
+  "company": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+/**
+ * Removes a contact
+ * @summary Delete contact
+ */
+export const DeleteContactParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DeleteContactResponse = zod.object({
+  "success": zod.boolean().optional()
+})
+
+
+/**
+ * Returns calendar events for the current week
+ * @summary List calendar events
+ */
+export const ListCalendarEventsResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "startAt": zod.string(),
+  "endAt": zod.string(),
+  "location": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "attendees": zod.array(zod.object({
+  "email": zod.string(),
+  "name": zod.string().optional(),
+  "status": zod.enum(['accepted', 'tentative', 'declined', 'pending']).optional()
+})).optional()
+})
+export const ListCalendarEventsResponse = zod.array(ListCalendarEventsResponseItem)
+
+
+/**
+ * Creates a new calendar event
+ * @summary Create event
+ */
+export const CreateCalendarEventBody = zod.object({
+  "title": zod.string(),
+  "startAt": zod.string(),
+  "endAt": zod.string(),
+  "location": zod.string().optional(),
+  "description": zod.string().optional(),
+  "attendees": zod.array(zod.string()).optional()
+})
+
+

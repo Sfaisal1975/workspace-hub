@@ -116,7 +116,177 @@ export interface PublishedPageDetail {
   content: PublishedPageDetailContentItem[];
 }
 
+export interface MailAccount {
+  id: string;
+  name: string;
+  email: string;
+  provider: string;
+  /** @nullable */
+  avatarUrl?: string | null;
+}
+
+export type MailFolderType = typeof MailFolderType[keyof typeof MailFolderType];
+
+
+export const MailFolderType = {
+  inbox: 'inbox',
+  sent: 'sent',
+  drafts: 'drafts',
+  trash: 'trash',
+  spam: 'spam',
+  archive: 'archive',
+} as const;
+
+export interface MailFolder {
+  id: string;
+  name: string;
+  accountId: string;
+  type: MailFolderType;
+  unreadCount?: number;
+}
+
+export type EmailSender = {
+  name: string;
+  email: string;
+  /** @nullable */
+  avatarUrl?: string | null;
+};
+
+export type EmailRecipientsItem = {
+  name: string;
+  email: string;
+};
+
+export interface Email {
+  id: string;
+  subject: string;
+  sender: EmailSender;
+  recipients: EmailRecipientsItem[];
+  folderId: string;
+  isRead: boolean;
+  isStarred: boolean;
+  sentAt: string;
+  preview?: string;
+  hasAttachments?: boolean;
+}
+
+export type EmailDetailSender = {
+  name: string;
+  email: string;
+  /** @nullable */
+  avatarUrl?: string | null;
+};
+
+export type EmailDetailRecipientsItem = {
+  name: string;
+  email: string;
+};
+
+export interface EmailAttachment {
+  id: string;
+  name: string;
+  size: number;
+  mimeType: string;
+}
+
+export interface EmailDetail {
+  id: string;
+  subject: string;
+  sender: EmailDetailSender;
+  recipients: EmailDetailRecipientsItem[];
+  folderId: string;
+  isRead: boolean;
+  isStarred: boolean;
+  sentAt: string;
+  body: string;
+  preview?: string;
+  hasAttachments?: boolean;
+  attachments?: EmailAttachment[];
+}
+
+export interface EmailUpdate {
+  isRead?: boolean;
+  isStarred?: boolean;
+  folderId?: string;
+}
+
+export interface EmailMoveInput {
+  folderId: string;
+}
+
+export interface EmailSendInput {
+  subject: string;
+  recipients: string[];
+  body: string;
+  cc?: string[];
+  bcc?: string[];
+  accountId?: string;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface ContactInput {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  notes?: string;
+}
+
+export type CalendarEventAttendeesItemStatus = typeof CalendarEventAttendeesItemStatus[keyof typeof CalendarEventAttendeesItemStatus];
+
+
+export const CalendarEventAttendeesItemStatus = {
+  accepted: 'accepted',
+  tentative: 'tentative',
+  declined: 'declined',
+  pending: 'pending',
+} as const;
+
+export type CalendarEventAttendeesItem = {
+  email: string;
+  name?: string;
+  status?: CalendarEventAttendeesItemStatus;
+};
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  startAt: string;
+  endAt: string;
+  /** @nullable */
+  location?: string | null;
+  /** @nullable */
+  description?: string | null;
+  attendees?: CalendarEventAttendeesItem[];
+}
+
+export interface CalendarEventInput {
+  title: string;
+  startAt: string;
+  endAt: string;
+  location?: string;
+  description?: string;
+  attendees?: string[];
+}
+
 export type SearchNotionParams = {
 q: string;
+};
+
+export type DeleteContact200 = {
+  success?: boolean;
 };
 
