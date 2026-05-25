@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: notion
+    description: Notion workspace operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,139 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /notion/workspace:
+    get:
+      operationId: getWorkspaceOverview
+      tags: [notion]
+      summary: Workspace overview
+      description: Returns workspace summary with pages and databases count
+      responses:
+        "200":
+          description: Workspace overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceOverview"
+  /notion/databases:
+    get:
+      operationId: listDatabases
+      tags: [notion]
+      summary: List databases
+      description: Returns all databases in the workspace
+      responses:
+        "200":
+          description: List of databases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotionDatabase"
+  /notion/databases/{id}:
+    get:
+      operationId: getDatabase
+      tags: [notion]
+      summary: Get database details
+      description: Returns a single database with its schema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Database details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotionDatabase"
+  /notion/databases/{id}/entries:
+    get:
+      operationId: listDatabaseEntries
+      tags: [notion]
+      summary: List database entries
+      description: Returns all entries in a database
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotionEntry"
+  /notion/entries/{entryId}:
+    patch:
+      operationId: updateEntry
+      tags: [notion]
+      summary: Update a database entry
+      description: Updates properties of a database entry
+      parameters:
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntryUpdate"
+      responses:
+        "200":
+          description: Updated entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotionEntry"
+  /notion/pages/{id}:
+    get:
+      operationId: getPage
+      tags: [notion]
+      summary: Get page content
+      description: Returns a Notion page with content blocks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Page content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotionPage"
+  /notion/search:
+    get:
+      operationId: searchNotion
+      tags: [notion]
+      summary: Search workspace
+      description: Search pages and databases by title
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +168,92 @@ components:
           type: string
       required:
         - status
-
+    WorkspaceOverview:
+      type: object
+      required: [totalPages, totalDatabases]
+      properties:
+        totalPages:
+          type: integer
+        totalDatabases:
+          type: integer
+        recentItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+    NotionDatabase:
+      type: object
+      required: [id, title, properties]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        createdAt:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: object
+    NotionEntry:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        title:
+          type: ["string", "null"]
+        url:
+          type: string
+        createdAt:
+          type: string
+        properties:
+          type: object
+          additionalProperties: true
+    EntryUpdate:
+      type: object
+      properties:
+        properties:
+          type: object
+          additionalProperties: true
+    NotionPage:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        createdAt:
+          type: string
+        content:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              text:
+                type: ["string", "null"]
+              children:
+                type: array
+                items:
+                  type: object
+    SearchResult:
+      type: object
+      required: [id, title, type]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+          enum: [page, database]
+        url:
+          type: string
+        createdAt:
+          type: string
