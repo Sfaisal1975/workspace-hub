@@ -1,6 +1,6 @@
-# [Project name]
+# Workspace Hub
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A monorepo containing two full-stack web apps: Notion Hub (page explorer) and Mail (Outlook-style email client), sharing a common PostgreSQL backend and API server.
 
 ## Run & Operate
 
@@ -22,19 +22,38 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+| Layer | Path | Description |
+|-------|------|-------------|
+| API Server | `artifacts/api-server/` | Express 5 backend, OpenAPI-first, serves both apps |
+| Notion Hub | `artifacts/notion-hub/` | Vite React app — Notion page explorer |
+| Mail App | `artifacts/mail-app/` | Vite React app — Inbox, Calendar, Contacts, Compose, Settings |
+| Mockup Sandbox | `artifacts/mockup-sandbox/` | Canvas component preview server |
+| DB Schema | `lib/db/src/schema/` | Drizzle ORM schemas (mail.ts, notion.ts) |
+| API Spec | `lib/api-spec/openapi.yaml` | OpenAPI contract → Orval generates hooks + Zod |
+| Shared UI | `lib/ui/` | shadcn/ui components + Tailwind theme |
+| API Client | `lib/api-client-react/` | Orval-generated React Query hooks & Zod schemas |
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- **OpenAPI-first**: All endpoints are defined in `lib/api-spec/openapi.yaml` first; Orval generates React Query hooks and Zod schemas. This keeps frontend and backend in sync automatically.
+- **Date serialization**: Drizzle `timestamp` returns `Date` objects, but OpenAPI/Zod expects ISO strings. All mail route responses explicitly call `.toISOString()` before `zod.parse()` — a gotcha if forgotten.
+- **Orval query keys**: Generated `useGet*` hooks require `queryKey` in options or TypeScript throws `TS2741`. Always include it when calling generated query hooks.
+- **Monorepo routing**: Each artifact registers a `previewPath` (e.g. `/mail/`, `/notion/`) via Replit's artifact system. The shared proxy routes by path prefix.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Notion Hub** — Browse and view Notion pages via the Notion API (requires `NOTION_API_KEY`)
+- **Mail App** — Full email client with:
+  - **Inbox**: Three-pane Outlook-style layout (folders, email list, reader pane)
+  - **Compose**: New email composer with contact autocomplete
+  - **Calendar**: Weekly event list with location, attendees, duration
+  - **Contacts**: Searchable directory with add/delete
+  - **Settings**: Account, notifications, privacy, appearance preferences
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Push entire project to GitHub so Claude Code (or other agents) can pull it
+- Keep `replit.md` up to date as a master spec / project index
 
 ## Gotchas
 
