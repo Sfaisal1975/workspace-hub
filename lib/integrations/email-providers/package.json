@@ -1,0 +1,19 @@
+{
+  "name": "@workspace/email-providers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "googleapis": "^148.0.0",
+    "imapflow": "^1.0.171",
+    "nodemailer": "^7.0.3",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/nodemailer": "^6.4.17"
+  }
+}
