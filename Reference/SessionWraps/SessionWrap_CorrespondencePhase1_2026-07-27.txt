@@ -1,0 +1,126 @@
+SESSION WRAP -- Standard
+Date: 27 July 2026
+Project: workspace-hub (correspondence root #23)
+Window: W05 (Claude Code)
+
+========================================================================
+WHAT WAS DONE
+========================================================================
+
+Built the full Phase 1 scaffold for the Correspondence app -- a unified
+email client supporting Gmail (OAuth2) and iCloud (IMAP/SMTP) -- inside
+the workspace-hub pnpm monorepo.
+
+Deliverables:
+- Email providers library (@workspace/email-providers) with unified
+  EmailProvider interface, full GmailProvider (OAuth2, list/read/send/
+  star/trash/labels, token auto-refresh), and full ICloudProvider
+  (IMAP via imapflow, SMTP via nodemailer, folder/flag/move/trash).
+- DB schema: correspondence_accounts table for storing provider
+  credentials and sync metadata.
+- API routes: /api/correspondence/* with account CRUD and Gmail
+  OAuth2 consent/callback endpoints.
+- Frontend artifact: Vite/React/Tailwind app with sidebar layout,
+  inbox (empty state with account CTA), compose (placeholder),
+  and accounts page (list/delete with provider icons).
+- All workspace wiring: tsconfig refs, route index, esbuild externals,
+  pnpm deps resolved.
+- All typechecks pass (libs, api-server, correspondence).
+- CLAUDE_CODE_BRIEF.md updated with correspondence documentation.
+
+========================================================================
+FILES AND REPOS CHANGED
+========================================================================
+
+Repo: workspace-hub (github.com/Sfaisal1975/workspace-hub)
+Branch: main
+
+Commit 3bc09cb: feat: Add correspondence app (Phase 1 scaffold)
+  CREATED:
+    lib/db/src/schema/correspondence.ts
+    lib/integrations/email-providers/package.json
+    lib/integrations/email-providers/tsconfig.json
+    lib/integrations/email-providers/src/types.ts
+    lib/integrations/email-providers/src/gmail.ts
+    lib/integrations/email-providers/src/icloud.ts
+    lib/integrations/email-providers/src/index.ts
+    artifacts/api-server/src/routes/correspondence.ts
+    artifacts/correspondence/package.json
+    artifacts/correspondence/tsconfig.json
+    artifacts/correspondence/vite.config.ts
+    artifacts/correspondence/index.html
+    artifacts/correspondence/src/main.tsx
+    artifacts/correspondence/src/App.tsx
+    artifacts/correspondence/src/index.css
+    artifacts/correspondence/src/lib/utils.ts
+    artifacts/correspondence/src/lib/api.ts
+    artifacts/correspondence/src/hooks/use-accounts.ts
+    artifacts/correspondence/src/components/layout.tsx
+    artifacts/correspondence/src/components/ui/tooltip.tsx
+    artifacts/correspondence/src/components/ui/sonner.tsx
+    artifacts/correspondence/src/pages/inbox.tsx
+    artifacts/correspondence/src/pages/compose.tsx
+    artifacts/correspondence/src/pages/accounts.tsx
+    artifacts/correspondence/src/pages/not-found.tsx
+  MODIFIED:
+    lib/db/src/schema/index.ts
+    artifacts/api-server/src/routes/index.ts
+    artifacts/api-server/build.mjs
+    artifacts/api-server/package.json
+    tsconfig.json
+    pnpm-lock.yaml
+
+Commit 19cd22d: docs: Update routing brief with correspondence docs
+  MODIFIED:
+    CLAUDE_CODE_BRIEF.md
+
+========================================================================
+OUTSTANDING (priority-tagged)
+========================================================================
+
+1. [MEDIUM] Push DB schema -- run pnpm --filter @workspace/db run push
+   on a machine with DATABASE_URL set. The correspondence_accounts
+   table will not exist until this runs.
+
+2. [MEDIUM] Gmail OAuth2 end-to-end -- wire consent URL, callback,
+   token storage, test real inbox fetch. Requires:
+   - GMAIL_CLIENT_ID (Google Cloud Console)
+   - GMAIL_CLIENT_SECRET (Google Cloud Console)
+   - GMAIL_REDIRECT_URI (Google Cloud Console)
+
+3. [MEDIUM] iCloud account setup UI -- app-specific password entry
+   form with IMAP credential validation.
+
+4. [MEDIUM] Real inbox fetching -- unified message list view pulling
+   from connected Gmail and iCloud providers.
+
+5. [LOW] Compose with account selection -- send email from any
+   connected account.
+
+========================================================================
+GATES AND BLOCKERS
+========================================================================
+
+- DB schema push blocked locally (no DATABASE_URL in local env).
+  Must run on the server where the database is provisioned.
+- Gmail OAuth2 requires three env vars from Google Cloud Console.
+  These must be configured before Phase 2 Gmail work can proceed.
+- No VitalMatrix gates active on this project root.
+
+========================================================================
+NEXT SESSION FIRST TASK
+========================================================================
+
+Push the correspondence_accounts schema to the database, then start
+Phase 2: Gmail OAuth2 consent flow end-to-end (auth URL generation,
+callback handling, token persistence, first real inbox fetch).
+
+========================================================================
+NOTION REFERENCES
+========================================================================
+
+Session log: https://app.notion.com/p/3aac2e2d378281ce8ca2c338d2113a5c
+To Do item:  https://app.notion.com/p/3a6c2e2d378281ae9a45cfcd363345ac
+
+========================================================================
+VitalMatrix Ltd | ICO ZC101813 | W05 Standard Wrap | 27 July 2026
