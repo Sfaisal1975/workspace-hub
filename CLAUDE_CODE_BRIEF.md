@@ -6,11 +6,12 @@
 
 ## What This Is
 
-A full-stack pnpm monorepo with two web apps sharing a PostgreSQL backend:
+A full-stack pnpm monorepo with three web apps sharing a PostgreSQL backend:
 
 - **Mail App** (`artifacts/mail-app/`) — Outlook-style email client: Inbox, Compose, Calendar, Contacts, Settings
 - **Notion Hub** (`artifacts/notion-hub/`) — Notion page explorer, content hub, search
-- **API Server** (`artifacts/api-server/`) — Express 5 backend serving both apps
+- **Correspondence** (`artifacts/correspondence/`) — Unified email client: Gmail (OAuth2) + iCloud (IMAP/SMTP). Phase 1 scaffold complete; Phase 2 pending.
+- **API Server** (`artifacts/api-server/`) — Express 5 backend serving all apps
 - **Mockup Sandbox** (`artifacts/mockup-sandbox/`) — Canvas component preview server
 
 ## First-Time Setup After Clone
@@ -34,6 +35,7 @@ pnpm --filter @workspace/db run push
 pnpm --filter @workspace/api-server run dev   # port 5000
 pnpm --filter @workspace/mail-app run dev      # served by replit proxy at /mail/
 pnpm --filter @workspace/notion-hub run dev    # served by replit proxy at /notion/
+pnpm --filter @workspace/correspondence run dev # port 5174, /correspondence/
 
 # 6. Full typecheck (do this before any PR)
 pnpm run typecheck
@@ -99,11 +101,15 @@ Use relative URLs in frontend code. Never use root-relative `/api/...` — it es
 | Generated Zod schemas | `lib/api-zod/src/` |
 | DB schema — mail tables | `lib/db/src/schema/mail.ts` |
 | DB schema — notion tables | `lib/db/src/schema/publishedPages.ts` |
+| DB schema — correspondence | `lib/db/src/schema/correspondence.ts` |
+| Email providers lib | `lib/integrations/email-providers/src/` |
 | Mail API routes | `artifacts/api-server/src/routes/mail.ts` |
 | Notion API routes | `artifacts/api-server/src/routes/notion.ts` |
 | Mail app pages | `artifacts/mail-app/src/pages/{inbox,calendar,contacts,compose,settings}.tsx` |
 | Mail app layout | `artifacts/mail-app/src/components/layout.tsx` |
 | Notion Hub pages | `artifacts/notion-hub/src/pages/{dashboard,databases,database,page,search,content-hub,public-page}.tsx` |
+| Correspondence API routes | `artifacts/api-server/src/routes/correspondence.ts` |
+| Correspondence app pages | `artifacts/correspondence/src/pages/{inbox,compose,accounts}.tsx` |
 | Shared UI components | `lib/ui/src/components/ui/` |
 | Shared theme/styles | `lib/ui/src/index.css` |
 
@@ -126,6 +132,27 @@ All under `/api/mail/*`:
 | DELETE | `/mail/contacts/{contactId}` | Delete contact |
 | GET | `/mail/calendar` | List calendar events |
 | GET | `/mail/calendar/events/{eventId}` | Get event details |
+
+## API Endpoints (Correspondence)
+
+All under `/api/correspondence/*`:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/accounts` | List connected email accounts |
+| GET | `/accounts/:accountId` | Get single account |
+| POST | `/accounts` | Add email account (Gmail or iCloud) |
+| DELETE | `/accounts/:accountId` | Remove account |
+| GET | `/auth/gmail/url` | Get Gmail OAuth2 consent URL |
+| POST | `/auth/gmail/callback` | Exchange OAuth2 code for tokens |
+
+## Database Schema (Correspondence)
+
+Table in `lib/db/src/schema/correspondence.ts`:
+
+- `correspondence_accounts` — provider account (id, userId, displayName, email, provider [gmail|icloud], isActive, credentialsJson, metadataJson, lastSyncAt)
+
+Env vars: `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REDIRECT_URI`
 
 ## Database Schema (Mail)
 
